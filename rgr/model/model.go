@@ -108,7 +108,18 @@ func (m *Model) Delete(table string, pkey map[string]string) error {
 }
 
 func (m *Model) GenerateDataSet(size int) error {
-	_, err := m.db.Query(queries.GetGeneratingQuery(), size)
+	_, err := m.db.Query(queries.GetUserGeneratingQuery(), size)
+	if err != nil {
+		return err
+	}
+	_, err = m.db.Query(queries.GenerateSkillsQuery(), size)
+	if err != nil {
+		return err
+	}
+	_, err = m.db.Query(queries.GenerateConnectionQuery(), size)
+	if err != nil {
+		return err
+	}
 	return err
 }
 

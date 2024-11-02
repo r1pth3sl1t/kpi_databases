@@ -58,7 +58,7 @@ func PrepareDeleteQuery(table string, pkey map[string]string) (string, []any) {
 	return query, values
 }
 
-func GetGeneratingQuery() string {
+func GetUserGeneratingQuery() string {
 	return `
 	insert into public.user(user_id, first_name, last_name, email)
 	select * from (select row_number() over() as user_id,
@@ -86,7 +86,36 @@ cross join unnest(array['Ivanenko', 'Petrenko', 'Shevchenko',
 						'Bondar', 'Savchenko', 'Korol']) as last_name) as users
 where user_id not in (select user_id from public.user)
 order by random()
-limit $1
+limit $1;
+
+`
+}
+
+func GenerateSkillsQuery() string {
+	return `
+	insert into users_to_skills(user_id, skill_id)
+	select user_id, skill_id from "user"
+	cross join skill
+	where not(user_id in (select user_id from "users_to_skills") 
+				  and 
+			  skill_id in (select skill_id from "users_to_skills"))
+	order by random()
+	limit $1;
+`
+}
+
+func GenerateConnectionQuery() string {
+	return `
+	insert into "connection"(u1, u2)
+	select u1t.user_id as u1, u2t.user_id as u2 from "user" as u1t
+	cross join "user" as u2t
+	where u1t.user_id != u2t.user_id
+	and not(
+	u1t.user_id in (select u1 from connection) and
+	u2t.user_id in (select u2 from connection)
+	)
+	order by random()
+	limit $1;
 `
 }
 
