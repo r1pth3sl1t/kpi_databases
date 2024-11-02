@@ -34,6 +34,7 @@ func (v *View) Index(optionsNum int) (int, error) {
 	fmt.Println("3. Delete data")
 	fmt.Println("4. Generate dataset")
 	fmt.Println("5. Search data")
+	fmt.Println("0. Exit")
 
 	var choice int
 	_, err := fmt.Scan(&choice)
@@ -148,7 +149,9 @@ func (v *View) GetSearchingMode() (search.SearchQueryHandler, error) {
 	return v.modes[value], nil
 }
 
-func (v *View) IndexColumns(columns []string, head string) {
+func (v *View) IndexColumns(time int64, columns []string, head string) {
+	fmt.Print("Time: ")
+	fmt.Println(time)
 	fmt.Println("Columns: ")
 	fmt.Println(head)
 	for _, column := range columns {

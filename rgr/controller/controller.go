@@ -35,13 +35,17 @@ func (c *Controller) Destroy() {
 	c.model.Close()
 }
 
-func (c *Controller) Index() {
+func (c *Controller) Index() bool {
 	option, err := c.view.Index(len(c.options))
+	if option == 0 {
+		return false
+	}
 	if err != nil {
 		c.view.Error(err)
-		return
+		return true
 	}
 	c.options[option]()
+	return true
 }
 
 func (c *Controller) InsertData() {
@@ -107,13 +111,13 @@ func (c *Controller) SearchData() {
 		return
 	}
 	data := c.view.FetchAttributes(searchHandler.FetchSearchAttributes())
-	columns, err := c.model.Search(searchHandler.Search(), data, searchHandler.FetchSearchAttributes())
+	time, columns, err := c.model.Search(searchHandler.Search(), data, searchHandler.FetchSearchAttributes())
 
 	if err != nil {
 		c.view.Error(err)
 		return
 	}
 
-	c.view.IndexColumns(columns, searchHandler.Head())
+	c.view.IndexColumns(time, columns, searchHandler.Head())
 
 }

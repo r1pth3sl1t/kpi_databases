@@ -7,6 +7,7 @@ import (
 	_ "github.com/lib/pq"
 	"os"
 	"rgr/queries"
+	"time"
 )
 
 type DatabaseCredentials struct {
@@ -102,7 +103,6 @@ func (m *Model) Update(tableName string, data map[string]string, pkey map[string
 
 func (m *Model) Delete(table string, pkey map[string]string) error {
 	query, values := queries.PrepareDeleteQuery(table, pkey)
-	
 	_, err := m.db.Query(query, values...)
 	return err
 }
@@ -123,13 +123,14 @@ func (m *Model) GenerateDataSet(size int) error {
 	return err
 }
 
-func (m *Model) Search(query string, data map[string]string, attrOrder []string) ([]string, error) {
+func (m *Model) Search(query string, data map[string]string, attrOrder []string) (int64, []string, error) {
 	var args []any
 	for _, attr := range attrOrder {
 		args = append(args, data[attr])
 	}
-
+	start := time.Now()
 	rows, err := m.db.Query(query, args...)
+	end := time.Now()
 	var rowsToReturn []string
 	userId := 0
 	connectionsNum := 0
@@ -138,11 +139,11 @@ func (m *Model) Search(query string, data map[string]string, attrOrder []string)
 	for rows.Next() {
 		err := rows.Scan(&userId, &firstName, &lastName, &connectionsNum)
 		if err != nil {
-			return rowsToReturn, err
+			return 0, rowsToReturn, err
 		}
 		row = fmt.Sprintf("%8d | %15s | %15s | %15d", userId, firstName, lastName, connectionsNum)
 		rowsToReturn = append(rowsToReturn, row)
 	}
 
-	return rowsToReturn, err
+	return end.UnixMilli() - start.UnixMilli(), rowsToReturn, err
 }
