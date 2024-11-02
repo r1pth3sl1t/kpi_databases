@@ -3,7 +3,7 @@ package queries
 import "strconv"
 
 func PrepareInsertQuery(table string, data map[string]string) (string, []any) {
-	query := "INSERT INTO public." + table + "("
+	query := "INSERT INTO \"" + table + "\"("
 	var values []any
 	for column := range data {
 		query += column + ","
@@ -22,8 +22,8 @@ func PrepareInsertQuery(table string, data map[string]string) (string, []any) {
 }
 
 func PrepareUpdateQuery(table string, data map[string]string, pkey map[string]string) (string, []any) {
-	query := "UPDATE public." + table
-	query += " SET "
+	query := "UPDATE \"" + table
+	query += "\" SET "
 	i := 1
 	var values []any
 	for column := range data {
@@ -45,7 +45,7 @@ func PrepareUpdateQuery(table string, data map[string]string, pkey map[string]st
 
 func PrepareDeleteQuery(table string, pkey map[string]string) (string, []any) {
 	var values []any
-	query := "DELETE FROM " + table + " WHERE "
+	query := "DELETE FROM \"" + table + "\" WHERE "
 	i := 1
 	for key := range pkey {
 		query += key + " = $" + strconv.Itoa(i) + " AND "
