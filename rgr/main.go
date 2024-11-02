@@ -10,9 +10,8 @@ func main() {
 		panic(err.Error())
 	}
 	defer c.Destroy()
-
-	for {
-		c.Index()
+	
+	for c.Index() {
 	}
 
 }
