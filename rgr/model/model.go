@@ -102,7 +102,7 @@ func (m *Model) Update(tableName string, data map[string]string, pkey map[string
 
 func (m *Model) Delete(table string, pkey map[string]string) error {
 	query, values := queries.PrepareDeleteQuery(table, pkey)
-	fmt.Println(query)
+	
 	_, err := m.db.Query(query, values...)
 	return err
 }
