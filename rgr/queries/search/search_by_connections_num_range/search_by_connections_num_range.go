@@ -11,16 +11,16 @@ type SearcherByConnectionsNumRange struct {
 
 func (s *SearcherByConnectionsNumRange) Search() string {
 	return `
-		select user_id, first_name, last_name, count(*) as connections_num 
-		from (select * from "user"
-			join "connection"
-			on "user".user_id = "connection".u1
-			union 
-			select * from "user"
-			join "connection"
-			on "user".user_id = "connection".u2) as users
-		group by user_id, first_name, last_name
-		having count(*) between $1 and $2
+		select user_id, first_name, last_name, count(u1) as connections_num 
+        from (select * from "user"
+            left join "connection"
+            on "user".user_id = "connection".u1
+            union 
+            select * from "user"
+            left join "connection"
+            on "user".user_id = "connection".u2) as users
+        group by user_id, first_name, last_name
+        having count(u1) between $1 and $2
 	`
 }
 

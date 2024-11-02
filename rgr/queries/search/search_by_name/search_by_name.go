@@ -11,13 +11,13 @@ type SearcherByName struct {
 
 func (s *SearcherByName) Search() string {
 	return `
-		select user_id, first_name, last_name, count(*) as connections_num 
+		select user_id, first_name, last_name, count(u1) as connections_num 
 		from (select * from "user"
-			join "connection"
+			left join "connection"
 			on "user".user_id = "connection".u1
 			union 
 			select * from "user"
-			join "connection"
+			left join "connection"
 			on "user".user_id = "connection".u2) as users
 		where first_name like $1 and last_name like $2
 		group by user_id, first_name, last_name
