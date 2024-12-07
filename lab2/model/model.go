@@ -194,7 +194,7 @@ func (m *Model) FetchTablePrimaryKeys() map[string][]string {
 		}
 	}
 
-	tables["Connection"] = []string{"userId1", "userId2"}
+	tables["Connection"] = []string{"UserId1", "UserId2"}
 	tables["UserSkill"] = []string{"UserId", "SkillId"}
 	return tables
 }
@@ -294,9 +294,34 @@ func (m *Model) Delete(table string, pkey map[string]string) error {
 		company := m.companyRepository.FindById(companyId)
 		return m.companyRepository.Delete(company)
 	case "Connection":
-		return errors.New("update is unsupported")
+		user1Id, err := strconv.Atoi(pkey["UserId1"])
+		if err != nil {
+			return err
+		}
+
+		user2Id, err := strconv.Atoi(pkey["UserId2"])
+		if err != nil {
+			return err
+		}
+
+		user1 := m.userRepository.FindById(user1Id)
+		user2 := m.userRepository.FindById(user2Id)
+
+		return m.db.Model(&user1).Association("Connections").Delete(&user2)
 	case "UserSkill":
-		return errors.New("update is unsupported")
+		userId, err := strconv.Atoi(pkey["UserId"])
+		if err != nil {
+			return err
+		}
+
+		skillId, err := strconv.Atoi(pkey["SkillId"])
+		if err != nil {
+			return err
+		}
+		user := m.userRepository.FindById(userId)
+		skill := m.skillRepository.FindById(skillId)
+
+		return m.db.Model(&user).Association("Skills").Delete(&skill)
 	case "Education":
 		educationId, err := strconv.Atoi(pkey["EducationId"])
 		if err != nil {
